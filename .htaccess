@@ -7,4 +7,7 @@
     RewriteEngine On
     # Runtime data and server-side code: never served over HTTP.
     RewriteRule ^(logs|backups|bin|config|database|includes|tests)/ - [F,L]
+    # Version-control metadata and dotfiles. The app is deployed by `git clone` into the web root,
+    # so .git/ (history, config) must never be readable over HTTP.
+    RewriteRule (^|/)\.(git|svn|hg|env) - [F,L]
 </IfModule>
