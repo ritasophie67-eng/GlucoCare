@@ -5,6 +5,12 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # Force HTTPS in production. Loopback hosts are exempt so local XAMPP
+    # development over plain http keeps working.
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
     # Runtime data and server-side code: never served over HTTP.
     RewriteRule ^(logs|backups|bin|config|database|includes|tests)/ - [F,L]
     # Version-control metadata and dotfiles. The app is deployed by `git clone` into the web root,
