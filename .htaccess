@@ -5,10 +5,13 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # Force HTTPS in production. Loopback hosts are exempt so local XAMPP
-    # development over plain http keeps working.
+
+    # Force HTTPS in production. TLS terminates at alwaysdata's proxy, so %{HTTPS} is
+    # not set even for real https requests; the proxy's X-Forwarded-Proto header is the
+    # reliable signal (absent for plain http). Loopback hosts are exempt so local
+    # XAMPP development stays on plain http.
     RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
-    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
     # Runtime data and server-side code: never served over HTTP.
