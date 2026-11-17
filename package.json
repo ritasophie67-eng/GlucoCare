@@ -1,0 +1,13 @@
+{
+  "name": "glucocare-cdss-ui",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Presentation layer build (Tailwind CSS) for the GlucoCare diabetes CDSS.",
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/app.css --minify",
+    "dev:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

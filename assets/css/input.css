@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   Design tokens — shadcn/ui compatible HSL variables.
+   Clinical blue palette, AA-contrast text on white and tinted surfaces.
+   ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 214 90% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-subtle: 214 95% 96%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 16%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 20% 38%;
+
+    --accent: 214 95% 96%;
+    --accent-foreground: 214 90% 34%;
+
+    --destructive: 356 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-subtle: 356 90% 97%;
+
+    --success: 158 68% 28%;
+    --success-foreground: 0 0% 100%;
+    --success-subtle: 152 76% 95%;
+
+    --warning: 32 90% 34%;
+    --warning-foreground: 0 0% 100%;
+    --warning-subtle: 44 96% 91%;
+
+    --border: 214 32% 90%;
+    --input: 214 28% 84%;
+    --ring: 214 90% 45%;
+
+    --chart-line: 214 90% 46%;
+    --chart-target: 158 60% 42%;
+    --chart-hypo: 32 92% 44%;
+    --chart-severe: 356 72% 48%;
+
+    /* Deep clinical-navy sidebar (same family as the sign-in hero) */
+    --sidebar: 214 62% 16%;
+    --sidebar-deep: 218 64% 11%;
+    --sidebar-foreground: 210 38% 92%;
+    --sidebar-muted: 212 30% 72%;
+    --sidebar-accent: 213 58% 24%;
+    --sidebar-border: 213 45% 24%;
+    --sidebar-ring: 199 89% 70%;
+
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Visible, consistent keyboard focus everywhere (WCAG 2.4.7). */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    @apply bg-primary/15;
+  }
+}
+
+@layer components {
+  /* Native dialog styled as a shadcn Dialog: focus trap + Esc come for free. */
+  dialog.app-dialog {
+    @apply w-[calc(100vw-2rem)] max-w-lg overflow-hidden rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lifted;
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
+  }
+
+  dialog.app-dialog::backdrop {
+    @apply bg-slate-950/50 backdrop-blur-[2px];
+  }
+
+  dialog.app-dialog[open] {
+    @apply flex flex-col animate-zoom-in;
+  }
+
+  /* Keep the page behind a modal from scrolling on short screens. */
+  body:has(dialog.app-dialog[open]) {
+    overflow: hidden;
+  }
+
+  /* Short screens: the title and footer stay pinned, only the content scrolls.
+     Dialogs that wrap their content in a <form> need the same column layout one level down. */
+  dialog.app-dialog[open] > form {
+    @apply flex min-h-0 flex-1 flex-col;
+  }
+
+  dialog.app-dialog[open] > :not(.app-dialog-body):not(form),
+  dialog.app-dialog[open] > form > :not(.app-dialog-body) {
+    flex: 0 0 auto;
+  }
+
+  .app-dialog-body {
+    @apply min-h-0 flex-1 overflow-y-auto px-6 py-5;
+    /* Thin, theme-coloured scrollbar so the modal edge stays clean when it scrolls. */
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+    overscroll-behavior: contain;
+  }
+
+  .app-dialog-body::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .app-dialog-body::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Print: the visit summary and any record page should leave the screen chrome behind. */
+@media print {
+  #sidebar,
+  #sidebar-backdrop,
+  #sidebar-toggle,
+  header.sticky,
+  body > footer,
+  .print\:hidden,
+  #toast-region {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .rounded-lg,
+  .shadow-card,
+  .shadow-lifted {
+    box-shadow: none !important;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+
+  @page {
+    margin: 14mm;
+  }
+}
+
+/* Thin, high-contrast scrollbars for dense clinical tables. */
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.scroll-area::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border));
+  border-radius: 9999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
