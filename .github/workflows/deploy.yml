@@ -1,0 +1,51 @@
+name: Deploy to alwaysdata
+
+# After every push to main, log into the alwaysdata account over SSH and fast-forward
+# ~/www/glucocare. The first runs are skipped (and green) until the DEPLOY_SSH_KEY
+# repository secret exists, so adding this file never breaks the build.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-alwaysdata
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    name: git pull on alwaysdata
+    runs-on: ubuntu-latest
+    env:
+      # A job-level `if` cannot read secrets, so copy it into env and gate the step instead.
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+    steps:
+      - name: Look for the deploy key
+        id: guard
+        run: |
+          if [ -n "$DEPLOY_SSH_KEY" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::DEPLOY_SSH_KEY is not set - skipping deploy."
+          fi
+
+      - name: Deploy
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          DEPLOY_HOST: ssh-glucocare.alwaysdata.net
+          DEPLOY_USER: glucocare
+          DEPLOY_PATH: /home/glucocare/www/glucocare
+        run: |
+          set -eu
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          # tr -d '\r': the key is copied from Windows, so strip CRLF line endings.
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes \
+            "$DEPLOY_USER@$DEPLOY_HOST" "cd $DEPLOY_PATH && git pull --ff-only"
