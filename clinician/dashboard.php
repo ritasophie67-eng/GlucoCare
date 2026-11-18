@@ -190,7 +190,7 @@ require __DIR__ . '/../includes/header.php';
     </section>
 
     <!-- Triage table -->
-    <section id="triage-table" class="<?= UI_CARD ?>" aria-labelledby="triage-title">
+    <section id="triage-table" class="scroll-mt-20 <?= UI_CARD ?>" aria-labelledby="triage-title">
         <div class="<?= UI_CARD_HEADER ?>">
             <div>
                 <h2 id="triage-title" class="<?= UI_CARD_TITLE ?>">Assigned patients</h2>

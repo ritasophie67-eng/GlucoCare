@@ -54,6 +54,8 @@
 
         const unit = t.unit || 'mg/dL';
         const isMmol = unit === 'mmol/L';
+        // Phones get fewer axis ticks, a smaller legend and no axis title so the plot stays readable.
+        const narrow = canvas.clientWidth > 0 && canvas.clientWidth < 480;
 
         new Chart(canvas, {
             type: 'line',
@@ -71,7 +73,7 @@
                         pointBackgroundColor: rows.map((r) => POINT_COLORS[r.band] || CHART_COLORS.line),
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: rows.length > 40 ? 2.5 : 4,
+                        pointRadius: rows.length > 40 ? 2.5 : (narrow ? 3 : 4),
                         pointHoverRadius: 7,
                     },
                     {
@@ -115,9 +117,9 @@
                             usePointStyle: true,
                             boxWidth: 7,
                             boxHeight: 7,
-                            padding: 14,
+                            padding: narrow ? 10 : 14,
                             color: CHART_COLORS.text,
-                            font: { size: 11, family: 'Inter, system-ui, sans-serif' },
+                            font: { size: narrow ? 10 : 11, family: 'Inter, system-ui, sans-serif' },
                             filter: (item) => !String(item.text).startsWith('Severe'),
                         },
                     },
@@ -141,11 +143,12 @@
                         grid: { color: CHART_COLORS.grid, drawBorder: false },
                         ticks: {
                             color: CHART_COLORS.text,
-                            font: { size: 11, family: 'Inter, system-ui, sans-serif' },
+                            font: { size: narrow ? 10 : 11, family: 'Inter, system-ui, sans-serif' },
+                            maxTicksLimit: narrow ? 5 : undefined,
                             callback: (v) => v + '',
                         },
                         title: {
-                            display: true,
+                            display: !narrow,
                             text: unit,
                             color: CHART_COLORS.text,
                             font: { size: 11, weight: '500', family: 'Inter, system-ui, sans-serif' },
@@ -155,10 +158,10 @@
                         grid: { display: false },
                         ticks: {
                             color: CHART_COLORS.text,
-                            maxTicksLimit: 8,
+                            maxTicksLimit: narrow ? 4 : 8,
                             maxRotation: 0,
                             autoSkip: true,
-                            font: { size: 11, family: 'Inter, system-ui, sans-serif' },
+                            font: { size: narrow ? 10 : 11, family: 'Inter, system-ui, sans-serif' },
                         },
                     },
                 },

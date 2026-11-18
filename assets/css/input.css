@@ -178,6 +178,11 @@
 
 /* Thin, high-contrast scrollbars for dense clinical tables. */
 .scroll-area {
+  /* Positioned so absolutely positioned descendants (e.g. .sr-only table captions)
+     are clipped by this box instead of widening the whole page on phones. */
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--border)) transparent;
 }
@@ -190,6 +195,64 @@
 .scroll-area::-webkit-scrollbar-thumb {
   background-color: hsl(var(--border));
   border-radius: 9999px;
+}
+
+/* iOS Safari zooms the page when a focused form control is under 16px. */
+@media (max-width: 639px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Reclaim horizontal room for modal content on narrow phones. */
+  .app-dialog-body {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  /* Comfortable tap areas for the controls that open/close overlays. */
+  [data-sidebar-toggle],
+  [data-sidebar-close],
+  [data-dialog-close] {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+/* Notched phones (landscape, standalone PWA): keep fixed chrome clear of the cutout. */
+@supports (padding: max(0px)) {
+  #sidebar {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  #toast-region {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  header.sticky {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  @media (min-width: 640px) {
+    header.sticky {
+      padding-left: max(1.5rem, env(safe-area-inset-left));
+      padding-right: max(1.5rem, env(safe-area-inset-right));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    header.sticky {
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
+    }
+  }
+
+  body > footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

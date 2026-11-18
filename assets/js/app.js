@@ -6,29 +6,46 @@
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
 
-    function setSidebar(open) {
+    const desktopNav = window.matchMedia('(min-width: 1024px)');
+
+    function setSidebar(open, returnFocus) {
         if (!sidebar || !backdrop) return;
+        // On desktop the sidebar is permanent, so never lock page scrolling there.
+        if (desktopNav.matches) open = true;
         sidebar.classList.toggle('-translate-x-full', !open);
         backdrop.classList.toggle('hidden', !open);
         document.getElementById('sidebar-toggle')?.setAttribute('aria-expanded', String(open));
-        document.body.classList.toggle('overflow-hidden', open);
-        if (open) sidebar.querySelector('a, button')?.focus();
+        document.body.classList.toggle('overflow-hidden', open && !desktopNav.matches);
+        // Keep the off-canvas drawer out of the tab order while it is closed on phones.
+        sidebar.inert = !open && !desktopNav.matches;
+        if (open && !desktopNav.matches) sidebar.querySelector('a, button')?.focus();
+        if (!open && returnFocus) document.getElementById('sidebar-toggle')?.focus();
     }
+
+    setSidebar(desktopNav.matches);
 
     document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
         setSidebar(sidebar.classList.contains('-translate-x-full'));
     });
-    backdrop?.addEventListener('click', () => setSidebar(false));
+    backdrop?.addEventListener('click', () => setSidebar(false, true));
     document.querySelectorAll('[data-sidebar-close]').forEach((btn) => {
-        btn.addEventListener('click', () => setSidebar(false));
+        btn.addEventListener('click', () => setSidebar(false, true));
     });
+
+    // Rotating or resizing across the breakpoint must release the scroll lock.
+    const onBreakpointChange = () => setSidebar(desktopNav.matches);
+    if (typeof desktopNav.addEventListener === 'function') {
+        desktopNav.addEventListener('change', onBreakpointChange);
+    } else if (typeof desktopNav.addListener === 'function') {
+        desktopNav.addListener(onBreakpointChange);
+    }
 
     // Printing is a click handler rather than an inline onclick, so a strict CSP can ban inline JS.
     document.querySelectorAll('[data-print]').forEach((btn) => {
         btn.addEventListener('click', () => window.print());
     });
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') setSidebar(false);
+        if (e.key === 'Escape') setSidebar(false, true);
     });
 
     // ---- Dialogs --------------------------------------------------------

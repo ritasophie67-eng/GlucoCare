@@ -22,7 +22,7 @@ $role = $role_meta[$user['role'] ?? 'patient'] ?? $role_meta['patient'];
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#f8fafc">
     <link rel="manifest" href="<?= BASE_URL ?>manifest.webmanifest">
     <link rel="icon" href="<?= BASE_URL ?>assets/img/favicon.svg" type="image/svg+xml">
@@ -39,7 +39,7 @@ $role = $role_meta[$user['role'] ?? 'patient'] ?? $role_meta['patient'];
 <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground">Skip to main content</a>
 
 <?php if ($layout === 'auth'): ?>
-<div class="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
+<div class="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
     <aside class="relative hidden flex-col overflow-hidden bg-slate-950 px-12 py-12 text-white lg:flex">
         <?php // Care photo with a layered scrim so the copy stays readable on any crop. ?>
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat saturate-105" aria-hidden="true"
@@ -85,19 +85,19 @@ $role = $role_meta[$user['role'] ?? 'patient'] ?? $role_meta['patient'];
         </div>
     </aside>
 
-    <main id="main-content" class="flex items-center justify-center bg-background px-5 py-10 sm:px-8">
+    <main id="main-content" class="flex items-center justify-center bg-background px-4 py-8 sm:px-8 sm:py-10">
         <div class="w-full max-w-[27rem]">
             <div class="mb-7 flex items-center gap-2.5 text-lg font-semibold tracking-tight text-foreground lg:hidden">
                 <span class="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground"><?= icon('droplet', 'h-5 w-5') ?></span>
                 <?= e(APP_NAME) ?>
             </div>
-            <div class="rounded-lg border border-border bg-card p-6 shadow-card sm:p-8">
+            <div class="rounded-lg border border-border bg-card p-5 shadow-card sm:p-8">
 <?php else: ?>
-<div class="flex min-h-screen">
+<div class="flex min-h-dvh">
     <div id="sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-slate-950/40 backdrop-blur-[1px] lg:hidden"></div>
 
     <aside id="sidebar" aria-label="Primary navigation"
-           class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-sidebar-border bg-gradient-to-b from-sidebar to-sidebar-deep text-sidebar-foreground transition-transform duration-200 ease-out lg:sticky lg:top-0 lg:h-screen lg:translate-x-0">
+           class="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] -translate-x-full flex-col border-r border-sidebar-border bg-gradient-to-b from-sidebar to-sidebar-deep text-sidebar-foreground transition-transform duration-200 ease-out lg:sticky lg:top-0 lg:h-dvh lg:max-w-none lg:translate-x-0">
         <div class="flex h-16 items-center justify-between border-b border-sidebar-border px-5">
             <a href="<?= BASE_URL ?>" class="flex min-w-0 items-center gap-2.5">
                 <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/10 text-white ring-1 ring-inset ring-white/15"><?= icon('droplet', 'h-5 w-5') ?></span>
@@ -112,7 +112,7 @@ $role = $role_meta[$user['role'] ?? 'patient'] ?? $role_meta['patient'];
             </button>
         </div>
 
-        <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <nav class="flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4">
             <p class="px-2.5 pb-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.09em] text-sidebar-muted/80">Workspace</p>
             <?php foreach (nav_items($user['role']) as [$path, $label, $iconName]): ?>
                 <?php $isActive = $currentScript !== '' && str_ends_with($currentScript, $path); ?>
@@ -163,5 +163,5 @@ $role = $role_meta[$user['role'] ?? 'patient'] ?? $role_meta['patient'];
             </span>
         </header>
 
-        <main id="main-content" class="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main id="main-content" class="mx-auto w-full max-w-[1400px] flex-1 scroll-mt-20 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 <?php endif; ?>
