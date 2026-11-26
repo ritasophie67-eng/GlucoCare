@@ -6,12 +6,13 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # The app is moving to a custom domain. Keep the old alwaysdata hostname alive by
-    # permanently redirecting it to the canonical domain, preserving path and query
-    # string. This must come before the HTTPS rule below so the redirect target is the
-    # new domain rather than the old host over HTTPS.
-    RewriteCond %{HTTP_HOST} ^glucocare\.alwaysdata\.net$ [NC]
-    RewriteRule ^(.*)$ https://glucocare.online/$1 [R=301,L]
+    # The app is moving to glucocare.online. The redirect below is DISABLED until that
+    # domain both serves this application and answers HTTPS: right now it resolves to a
+    # Hostinger parked-domain page, so redirecting to it takes the site offline.
+    # Re-enable by uncommenting these two lines once the app is deployed there:
+    #
+    #   RewriteCond %{HTTP_HOST} ^glucocare\.alwaysdata\.net$ [NC]
+    #   RewriteRule ^(.*)$ https://glucocare.online/$1 [R=301,L]
 
     # Force HTTPS in production. TLS terminates at alwaysdata's proxy, so %{HTTPS} is
     # not set even for real https requests; the proxy's X-Forwarded-Proto header is the
