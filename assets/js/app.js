@@ -333,3 +333,27 @@
         apply();
     }
 })();
+
+// ---- Referral target toggle ------------------------------------------------
+// "A doctor" or "a department" show different select boxes; only the visible one
+// is enabled, so the other field is never submitted with a stale value.
+(function () {
+    'use strict';
+    const radios = Array.from(document.querySelectorAll('[data-referral-target]'));
+    if (!radios.length) return;
+    const fields = Array.from(document.querySelectorAll('[data-referral-field]'));
+
+    function sync() {
+        const active = radios.find((r) => r.checked)?.getAttribute('data-referral-target') || 'department';
+        fields.forEach((field) => {
+            const match = field.getAttribute('data-referral-field') === active;
+            field.hidden = !match;
+            field.querySelectorAll('select, input, textarea').forEach((el) => {
+                el.disabled = !match;
+            });
+        });
+    }
+
+    radios.forEach((r) => r.addEventListener('change', sync));
+    sync();
+})();

@@ -31,7 +31,7 @@ date_default_timezone_set('Africa/Kampala');
 // Base URL of this phase folder, e.g. /Sophie/phase1/ (works for sub-folders such as /admin)
 if (!defined('BASE_URL')) {
     $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
-    $base = preg_replace('#/(patient|clinician|admin|config|includes|api|bin)$#i', '', $scriptDir);
+    $base = preg_replace('#/(patient|clinician|receptionist|admin|config|includes|api|bin)$#i', '', $scriptDir);
     define('BASE_URL', rtrim($base, '/') . '/');
 }
 

@@ -33,9 +33,10 @@ function current_user(): ?array
 function home_for_role(string $role): string
 {
     return match ($role) {
-        'patient'   => 'patient/dashboard.php',
-        'clinician' => 'clinician/dashboard.php',
-        'admin'     => 'admin/dashboard.php',
+        'patient'      => 'patient/dashboard.php',
+        'clinician'    => 'clinician/dashboard.php',
+        'receptionist' => 'receptionist/dashboard.php',
+        'admin'        => 'admin/dashboard.php',
         default     => 'login.php',
     };
 }
@@ -58,10 +59,11 @@ function attempt_login(PDO $pdo, string $identifier, string $password): array
     $stmt = $pdo->prepare("
         SELECT u.user_id, u.username, u.password_hash, u.role, u.email, u.is_active, u.must_change_password,
                u.org_id, u.totp_secret, u.totp_enabled,
-               COALESCE(c.full_name, p.full_name, u.username) AS full_name,
+               COALESCE(c.full_name, r.full_name, p.full_name, u.username) AS full_name,
                c.clinician_id, p.patient_id
         FROM users u
         LEFT JOIN clinicians c ON c.user_id = u.user_id
+        LEFT JOIN receptionists r ON r.user_id = u.user_id
         LEFT JOIN patients p ON p.user_id = u.user_id
         WHERE u.username = ? OR u.email = ?
         LIMIT 1");
@@ -181,6 +183,25 @@ function get_assigned_patient(PDO $pdo, int $patientId): ?array
     $stmt = $pdo->prepare('SELECT * FROM patients WHERE patient_id = ? AND clinician_id = ?');
     $stmt->execute([$patientId, $clinicianId]);
     return $stmt->fetch() ?: null;
+}
+
+/**
+ * Front desk may open ANY patient in its own organisation (it books and refers them), but
+ * never a patient from another organisation. Returns the patient row or redirects.
+ */
+function require_org_patient(PDO $pdo, int $patientId): array
+{
+    $stmt = $pdo->prepare('SELECT p.*, u.org_id FROM patients p JOIN users u ON u.user_id = p.user_id
+                           WHERE p.patient_id = ? AND u.org_id = ?');
+    $stmt->execute([$patientId, current_org_id()]);
+    $patient = $stmt->fetch();
+    if (!$patient) {
+        log_audit($pdo, (int)$_SESSION['user_id'], 'patients', 'ACCESS_DENIED',
+            "{$_SESSION['role']} {$_SESSION['username']} requested patient #{$patientId} outside their organisation.");
+        set_flash('danger', 'That patient is not in your register.');
+        redirect('receptionist/patients.php');
+    }
+    return $patient;
 }
 
 function require_assigned_patient(PDO $pdo, int $patientId): array

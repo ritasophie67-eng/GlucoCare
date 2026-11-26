@@ -12,9 +12,10 @@ $flash = take_flash();
 $currentScript = ltrim(str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? ''), '/');
 
 $role_meta = [
-    'patient'   => ['label' => 'Patient', 'tone' => 'bg-primary/10 text-primary'],
-    'clinician' => ['label' => 'Clinician', 'tone' => 'bg-success/10 text-success'],
-    'admin'     => ['label' => 'Administrator', 'tone' => 'bg-slate-900/8 text-slate-700'],
+    'patient'      => ['label' => 'Patient', 'tone' => 'bg-primary/10 text-primary'],
+    'clinician'    => ['label' => 'Clinician', 'tone' => 'bg-success/10 text-success'],
+    'receptionist' => ['label' => 'Front desk', 'tone' => 'bg-warning/15 text-warning'],
+    'admin'        => ['label' => 'Administrator', 'tone' => 'bg-slate-900/8 text-slate-700'],
 ];
 $role = $role_meta[$user['role'] ?? 'patient'] ?? $role_meta['patient'];
 ?>

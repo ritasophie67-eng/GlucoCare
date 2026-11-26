@@ -63,6 +63,10 @@ require __DIR__ . '/includes/header.php';
         <span><strong class="font-semibold text-foreground">Doctors:</strong> accounts are issued by your care-team administrator — contact them if you need access.</span>
     </p>
     <p class="flex items-start gap-2">
+        <?= icon('clipboard-list', 'mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400') ?>
+        <span><strong class="font-semibold text-foreground">Reception:</strong> front-desk accounts are issued by your administrator, and sign in here the same way.</span>
+    </p>
+    <p class="flex items-start gap-2">
         <?= icon('user', 'mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400') ?>
         <span>New patient? <a href="register.php" class="font-semibold text-primary hover:underline">Create your account</a></span>
     </p>

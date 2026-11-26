@@ -156,11 +156,16 @@ $schemaText = (string)file_get_contents($root . '/database/schema.postgres.sql')
 $stripped = preg_replace('/^\s*--.*$/m', '', $schemaText);
 $statements = array_values(array_filter(array_map('trim', explode(';', (string)$stripped))));
 truthy('splits into statements', count($statements) > 20);
-$badStatements = array_values(array_filter($statements, fn($s) => !preg_match('/^(CREATE|INSERT|SELECT)\s/i', $s)));
-check('every statement starts with CREATE/INSERT/SELECT', $badStatements === [] ? 'clean' : mb_substr($badStatements[0], 0, 80), 'clean');
+$badStatements = array_values(array_filter($statements, fn($s) => !preg_match('/^(CREATE|INSERT|SELECT|ALTER)\s/i', $s)));
+check('every statement starts with CREATE/INSERT/SELECT/ALTER', $badStatements === [] ? 'clean' : mb_substr($badStatements[0], 0, 80), 'clean');
 check('no MySQL backticks in the schema', preg_match('/`/', $schemaText), 0);
 $expectedTables = app_schema_tables();
-check('13 expected tables are declared', count($expectedTables), 13);
+check('16 expected tables are declared', count($expectedTables), 16);
+truthy('front desk and referral tables are declared',
+    in_array('receptionists', $expectedTables, true) && in_array('referrals', $expectedTables, true)
+    && in_array('departments', $expectedTables, true));
+truthy('role constraint allows the receptionist role',
+    str_contains($schemaText, "'receptionist'"));
 truthy('tables include app_settings and password_resets', in_array('app_settings', $expectedTables, true) && in_array('password_resets', $expectedTables, true));
 truthy('seed data advances identity sequences', str_contains($schemaText, "setval(pg_get_serial_sequence('users','user_id')"));
 

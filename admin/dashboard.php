@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/readings.php';
+require_once __DIR__ . '/../includes/receptionist.php';   // unowned_referral_count()
 require_once __DIR__ . '/../includes/cds_engine.php';
 require_once __DIR__ . '/../includes/digest.php';
 require_role('admin');
@@ -62,6 +63,10 @@ $stats = [
     ['Pending alerts (unassigned)', $count("SELECT COUNT(*) FROM clinical_alerts a JOIN patients p ON p.patient_id = a.patient_id WHERE a.status = 'pending' AND p.clinician_id IS NULL"), 'bell-off', 'text-destructive', 'bg-destructive/10', 'No doctor to review them'],
     ['Awaiting a doctor',   $count("SELECT COUNT(*) FROM patients p JOIN users u ON u.user_id = p.user_id WHERE p.clinician_id IS NULL AND u.username NOT LIKE 'sim\\_%'"), 'clock', 'text-warning', 'bg-warning/15', 'Unassigned patients'],
 ];
+
+// A referral to a department for a patient with no doctor has no clinical owner, so it is
+// counted here for routing (see admin/referrals.php).
+$stats[] = ['Referrals needing a doctor', unowned_referral_count($pdo), 'arrow-right', 'text-destructive', 'bg-destructive/10', 'No clinician can see them'];
 
 $logs = $pdo->query('SELECT a.*, u.username FROM audit_logs a LEFT JOIN users u ON u.user_id = a.user_id
                      ORDER BY a.log_id DESC LIMIT 8')->fetchAll();
@@ -245,6 +250,7 @@ $adminLinkRow = function (string $href, string $iconName, string $title, string 
 $adminActionsBody = '<div class="divide-y divide-border">'
     . $adminLinkRow('manage_clinicians.php', 'user-plus', 'Add a doctor', 'Issue credentials to a clinician and attach them to a hospital.')
     . $adminLinkRow('manage_patients.php', 'users', 'Assign patients', 'Move a patient under a named clinician.')
+    . $adminLinkRow('referrals.php', 'arrow-right', 'Route referrals', 'Assign a doctor to referrals that no clinician can see.')
     . $adminPostRow('scan', 'refresh-cw', 'Run engine scan', 'Re-evaluate every patient and refresh open alerts.')
     . $adminPostRow('digest_preview', 'eye', 'Preview digest', 'See who would be emailed about overdue critical alerts.')
     . $adminPostRow('digest_send', 'mail', 'Send digest now', 'Email every clinician with overdue critical alerts.')
